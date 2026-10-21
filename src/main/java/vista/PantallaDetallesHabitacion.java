@@ -5,6 +5,7 @@
 package vista;
 
 import Observer.Observador;
+import control.IFachadaControl;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -29,8 +30,8 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import modelo.ControlModeloNegocio;
 import modelo.Habitacion;
+import modelo.IFachadaOperacionesModelo;
 import modelo.Reservacion;
 
 /**
@@ -47,7 +48,8 @@ public class PantallaDetallesHabitacion extends JFrame implements Observador {
             new Color(220, 217, 217);
 
     // Modelo de negocio
-    private final ControlModeloNegocio controlModeloNegocio;
+    private final IFachadaOperacionesModelo fachadaModelo;
+    private final IFachadaControl fachadaControl;
 
     // Paneles principales
     private JPanel barraSuperior;
@@ -80,9 +82,10 @@ public class PantallaDetallesHabitacion extends JFrame implements Observador {
     private JButton botonReservar;
 
     public PantallaDetallesHabitacion(
-            ControlModeloNegocio controlModeloNegocio) {
+            IFachadaOperacionesModelo fachadaModelo, IFachadaControl fachadaControl) {
 
-        this.controlModeloNegocio = controlModeloNegocio;
+        this.fachadaModelo = fachadaModelo;
+        this.fachadaControl = fachadaControl;
 
         configurarVentana();
 
@@ -102,8 +105,7 @@ public class PantallaDetallesHabitacion extends JFrame implements Observador {
         add(panelPrincipal, BorderLayout.CENTER);
 
         // Registrar esta pantalla como observador.
-        // Sustituye el nombre si tu método de registro es diferente.
-        this.controlModeloNegocio.agregarObservador(this);
+        this.fachadaModelo.agregarObservador(this);
     }
 
     // ---------------------------------------------------------
@@ -392,8 +394,7 @@ public class PantallaDetallesHabitacion extends JFrame implements Observador {
             return;
         }
 
-        // Llamar directamente al modelo de negocio.
-        controlModeloNegocio.buscarHabitacionesDisponibles(
+        fachadaControl.buscarHabitacionesDisponibles(
                 numHuespedes,
                 entrada,
                 salida
@@ -574,7 +575,7 @@ public class PantallaDetallesHabitacion extends JFrame implements Observador {
 
         botonSeleccionar.addActionListener(e -> {
 
-            controlModeloNegocio.buscarHabitacionPorNumero(
+            fachadaControl.buscarHabitacionPorNumero(
                     habitacion.getNumero()
             );
         });
@@ -769,7 +770,7 @@ public class PantallaDetallesHabitacion extends JFrame implements Observador {
         );
         
         // Calcular el importe total de la estancia.
-Reservacion reservacion = controlModeloNegocio.recuperarReservacion();
+Reservacion reservacion = fachadaModelo.recuperarReservacion();
 
 if (reservacion == null
         || reservacion.getEntrada() == null
@@ -808,11 +809,12 @@ if (reservacion == null
     }
     
     private void abrirPantallaConfirmarReservacion() {
-    PantallaConfirmarReservacion pantalla =
-            new PantallaConfirmarReservacion(controlModeloNegocio);
-
-    pantalla.setVisible(true);
-    this.dispose();
+        this.dispose();
+        fachadaControl.abrirPantallaConfirmarReservacion();
+//    PantallaConfirmarReservacion pantalla =
+//            new PantallaConfirmarReservacion(fachadaModelo);
+//
+//    pantalla.setVisible(true);
 }
 
     // ---------------------------------------------------------
@@ -827,13 +829,13 @@ if (reservacion == null
 
             // Recuperar y mostrar las habitaciones disponibles.
             List<Habitacion> habitaciones =
-                    controlModeloNegocio.recuperarHabitacionesDisponibles();
+                    fachadaModelo.recuperarHabitacionesDisponibles();
 
             mostrarHabitaciones(habitaciones);
 
             // Recuperar la habitación seleccionada.
             Habitacion seleccionada =
-                    controlModeloNegocio.recuperarHabitacionSeleccionada();
+                    fachadaModelo.recuperarHabitacionSeleccionada();
 
             // Si es null, mostrarDetallesHabitacion maneja el caso.
             mostrarDetallesHabitacion(seleccionada);

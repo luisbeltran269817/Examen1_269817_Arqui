@@ -5,6 +5,7 @@
 package vista;
 
 
+import control.IFachadaControl;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -23,7 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.BorderFactory;
-import modelo.ControlModeloNegocio;
+import modelo.IFachadaOperacionesModelo;
 
 /**
  *
@@ -31,7 +32,8 @@ import modelo.ControlModeloNegocio;
  */
 public class PantallaPrincipal extends JFrame {
     
-    private final ControlModeloNegocio controlModeloNegocio;
+    private final IFachadaOperacionesModelo fachadaModelo;
+    private final IFachadaControl fachadaControl;
 
     // Colores de la interfaz
     private static final Color COLOR_BARRA = new Color(255, 227, 184);
@@ -43,8 +45,9 @@ public class PantallaPrincipal extends JFrame {
     private JPanel panelContenido;
     private JButton botonReservar;
 
-    public PantallaPrincipal(ControlModeloNegocio controlModeloNegocio) {
-        this.controlModeloNegocio = controlModeloNegocio;
+    public PantallaPrincipal(IFachadaOperacionesModelo fachadaModelo, IFachadaControl fachadaControl) {
+        this.fachadaModelo = fachadaModelo;
+        this.fachadaControl = fachadaControl;
 
         configurarVentana();
 
@@ -177,11 +180,12 @@ public class PantallaPrincipal extends JFrame {
     }
     
     private void abrirPantallaDetallesHabitacion() {
-    PantallaDetallesHabitacion pantalla =
-            new PantallaDetallesHabitacion(controlModeloNegocio);
-
-    pantalla.setVisible(true);
-    this.dispose();
+        this.dispose();
+        fachadaControl.abrirPantallaDetallesHabitacion();
+//    PantallaDetallesHabitacion pantalla =
+//            new PantallaDetallesHabitacion(fachadaModelo);
+//
+//    pantalla.setVisible(true);
 }
 
     //clase anidada, para hacer el panel con la imagen de fondo

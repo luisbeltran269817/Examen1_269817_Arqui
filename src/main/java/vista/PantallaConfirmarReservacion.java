@@ -5,6 +5,7 @@
 package vista;
 
 import Observer.Observador;
+import control.IFachadaControl;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -27,8 +28,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import modelo.Cliente;
-import modelo.ControlModeloNegocio;
 import modelo.Habitacion;
+import modelo.IFachadaOperacionesModelo;
 import modelo.Reservacion;
 
 /**
@@ -43,7 +44,8 @@ public class PantallaConfirmarReservacion extends JFrame implements Observador {
     private static final Color COLOR_PANEL =
             new Color(220, 217, 217);
 
-    private final ControlModeloNegocio controlModeloNegocio;
+    private final IFachadaOperacionesModelo fachadaModelo;
+    private final IFachadaControl fachadaControl;
 
     private JPanel barraSuperior;
     private JPanel panelIzquierdo;
@@ -62,9 +64,10 @@ public class PantallaConfirmarReservacion extends JFrame implements Observador {
     private boolean reservacionConfirmada = false;
 
     public PantallaConfirmarReservacion(
-            ControlModeloNegocio controlModeloNegocio) {
+            IFachadaOperacionesModelo fachadaModelo, IFachadaControl fachadaControl) {
 
-        this.controlModeloNegocio = controlModeloNegocio;
+        this.fachadaModelo = fachadaModelo;
+        this.fachadaControl = fachadaControl;
 
         configurarVentana();
         crearBarraSuperior();
@@ -93,11 +96,9 @@ public class PantallaConfirmarReservacion extends JFrame implements Observador {
         add(panelPrincipal, BorderLayout.CENTER);
 
         // Registrar la pantalla como observador.
-        this.controlModeloNegocio.agregarObservador(this);
+        this.fachadaModelo.agregarObservador(this);
 
-        // Mostrar inicialmente todos los clientes.
-        // El método buscarClientesDisponibles notifica a los observadores.
-        this.controlModeloNegocio.buscarClientesDisponibles("");
+        this.fachadaControl.buscarClientesDisponibles("");
     }
 
     private void configurarVentana() {
@@ -191,7 +192,7 @@ public class PantallaConfirmarReservacion extends JFrame implements Observador {
     }
 
     private void buscarClientes() {
-        controlModeloNegocio.buscarClientesDisponibles(
+        fachadaControl.buscarClientesDisponibles(
                 campoBusqueda.getText()
         );
     }
@@ -297,8 +298,7 @@ public class PantallaConfirmarReservacion extends JFrame implements Observador {
         botonSeleccionar.addActionListener(e -> {
             clienteSeleccionado = cliente;
 
-            // Asociar el cliente a la reservación actual.
-            controlModeloNegocio.seleccionarCliente(cliente);
+            fachadaControl.seleccionarCliente(cliente);
 
             mostrarDatosCliente(cliente);
         });
@@ -355,7 +355,7 @@ public class PantallaConfirmarReservacion extends JFrame implements Observador {
         }
 
         Reservacion reservacion =
-                controlModeloNegocio.recuperarReservacion();
+                fachadaModelo.recuperarReservacion();
 
         if (reservacion == null
                 || reservacion.getEntrada() == null
@@ -387,7 +387,7 @@ public class PantallaConfirmarReservacion extends JFrame implements Observador {
         botonAccion.setEnabled(false);
 
         try {
-            controlModeloNegocio.guardarReservacion();
+            fachadaControl.guardarReservacion();
         } catch (RuntimeException ex) {
             reservacionConfirmada = false;
             botonAccion.setEnabled(true);
@@ -459,8 +459,6 @@ public class PantallaConfirmarReservacion extends JFrame implements Observador {
         botonAccion.setText("Volver al menú");
         botonAccion.setEnabled(true);
 
-        // Cambiamos el color visual de la lista para indicar
-        // que la confirmación ya terminó.
         campoBusqueda.setEnabled(false);
 
         for (java.awt.Component componente
@@ -482,11 +480,13 @@ public class PantallaConfirmarReservacion extends JFrame implements Observador {
     }
     
     private void abrirPantallaPrincipal() {
-    PantallaPrincipal pantalla =
-            new PantallaPrincipal(controlModeloNegocio);
+        this.dispose();
+        fachadaControl.abrirPantallaPrincipal();
+//    PantallaPrincipal pantalla =
+//            new PantallaPrincipal(fachadaModelo);
+//
+//    pantalla.setVisible(true);
 
-    pantalla.setVisible(true);
-    this.dispose();
 }
 
     @Override
@@ -494,7 +494,7 @@ public class PantallaConfirmarReservacion extends JFrame implements Observador {
         SwingUtilities.invokeLater(() -> {
             // Recuperar los resultados actuales de la búsqueda.
             List<Cliente> clientes =
-                    controlModeloNegocio.recuperarClientesDisponibles();
+                    fachadaModelo.recuperarClientesDisponibles();
 
             mostrarClientes(clientes);
 
@@ -502,7 +502,7 @@ public class PantallaConfirmarReservacion extends JFrame implements Observador {
             // que el controlador acaba de guardar.
             if (reservacionConfirmada) {
                 Reservacion reservacion =
-                        controlModeloNegocio.recuperarReservacion();
+                        fachadaModelo.recuperarReservacion();
 
                 mostrarReservacionConfirmada(reservacion);
             } else if (clienteSeleccionado != null) {

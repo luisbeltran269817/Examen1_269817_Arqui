@@ -26,7 +26,7 @@ public class ControlModeloNegocio implements SujetoObservado {
     
     public void buscarHabitacionesDisponibles(int numHuespedes, Date entrada, Date salida) {
         if (catalogo == null || catalogo.getHabitaciones() == null) {
-            return;// new ArrayList<>();
+            return;
         }
         
         List<Habitacion> habitaciones = catalogo.getHabitaciones().stream()
@@ -41,7 +41,6 @@ public class ControlModeloNegocio implements SujetoObservado {
         
         notificarObservadores();
         
-        //return habitaciones;
     }
     
     public List<Habitacion> recuperarHabitacionesDisponibles(){
@@ -52,7 +51,7 @@ public class ControlModeloNegocio implements SujetoObservado {
         List<Habitacion> lista = catalogo.getHabitacionesDisponibles();
         
         if (lista == null) {
-            return;// null; 
+            return;
         }
         
         for (Habitacion h : lista) {
@@ -60,11 +59,11 @@ public class ControlModeloNegocio implements SujetoObservado {
                 catalogo.setHabitacionSeleccionada(h);
                 catalogo.getReservacionActual().setHabitacion(h);
                 notificarObservadores();
-                return;// h;
+                return;
             }
         }
     
-        return;// null;
+        return;
     }
     
     public Habitacion recuperarHabitacionSeleccionada(){
@@ -72,82 +71,75 @@ public class ControlModeloNegocio implements SujetoObservado {
     }
     
     public void buscarClientesDisponibles(String idBuscado) {
-    // Validamos que el catálogo y la lista principal de clientes no sean nulos
-    if (catalogo == null || catalogo.getClientes() == null) {
-        return;// new ArrayList<>();
-    }
+        if (catalogo == null || catalogo.getClientes() == null) {
+            return;
+        }
 
-    // Si el parámetro recibido es nulo, evitamos errores usando una cadena vacía
-    String filtro = (idBuscado != null) ? idBuscado : "";
+        String filtro = (idBuscado != null) ? idBuscado : "";
 
-    List<Cliente> clientesEncontrados = catalogo.getClientes().stream()
-            // Filtramos asegurándonos de que el ID del cliente no sea nulo 
-            // y que contenga los caracteres del parámetro buscado
+        List<Cliente> clientesEncontrados = catalogo.getClientes().stream()
             .filter(c -> c.getId() != null && c.getId().contains(filtro))
             .collect(Collectors.toList());
 
-    // Guardamos el resultado en la lista 'clientesDisponibles' de tu catálogo
+
     catalogo.setClientesDisponibles(clientesEncontrados);
-    notificarObservadores();
-    return;// clientesEncontrados;
-}
+        notificarObservadores();
+        return;
+    }
     
     public List<Cliente> recuperarClientesDisponibles(){
         return catalogo.getClientesDisponibles();
     }
     
     public void buscarClientePorId(String idBuscado) {
-    List<Cliente> listaDisponibles = catalogo.getClientesDisponibles();
+        List<Cliente> listaDisponibles = catalogo.getClientesDisponibles();
+        
+        if (listaDisponibles == null || idBuscado == null) {
+            return;
+        }
     
-    // Validamos que la lista y el parámetro no sean nulos
-    if (listaDisponibles == null || idBuscado == null) {
-        return;// null;
-    }
-    
-    // Buscamos el primer cliente cuyo ID coincida exactamente
-    Cliente clienteEncontrado = listaDisponibles.stream()
+        Cliente clienteEncontrado = listaDisponibles.stream()
             .filter(c -> c.getId() != null && c.getId().equals(idBuscado))
             .findFirst()
-            .orElse(null); // Devuelve null si no lo encuentra
+            .orElse(null);
             
-    // Si lo encontramos, lo guardamos en el catálogo como el cliente seleccionado
-    if (clienteEncontrado != null) {
-        catalogo.setClienteSeleccionado(clienteEncontrado);
+        if (clienteEncontrado != null) {
+            catalogo.setClienteSeleccionado(clienteEncontrado);
+        }
+    
+        catalogo.getReservacionActual().setCliente(clienteEncontrado);
+    
+        return;
     }
-    
-    catalogo.getReservacionActual().setCliente(clienteEncontrado);
-    
-    return;// clienteEncontrado;
-}
     
     public void seleccionarCliente(Cliente cliente) {
-    if (catalogo == null || catalogo.getReservacionActual() == null) {
-        return;
-    }
+        if (catalogo == null || catalogo.getReservacionActual() == null) {
+            return;
+        }
 
-    catalogo.getReservacionActual().setCliente(cliente);
-}
+        catalogo.getReservacionActual().setCliente(cliente);
+    }
     public void guardarReservacion() {
-    Reservacion actual = catalogo.getReservacionActual();
+        Reservacion actual = catalogo.getReservacionActual();
 
-    if (actual == null) {
-        return;
-    }
+        if (actual == null) {
+            return;
+        }
 
-    Reservacion reservacion = new Reservacion(
+        Reservacion reservacion = new Reservacion(
             actual.getEntrada(),
             actual.getSalida(),
             actual.getHuespedes(),
             actual.getCliente(),
             actual.getHabitacion()
-    );
+        );
 
-    catalogo.setReservacionActual(reservacion);
+        catalogo.setReservacionActual(reservacion);
     
-    catalogo.getReservacionActual().getHabitacion().setDisponible(false);
+        catalogo.getReservacionActual().getHabitacion().setDisponible(false);
 
-    notificarObservadores();
-}
+        notificarObservadores();
+    }
 
     
     public Reservacion recuperarReservacion(){

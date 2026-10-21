@@ -4,6 +4,7 @@
  */
 package modelo;
 
+import Observer.Observador;
 import java.util.Date;
 import java.util.List;
 
@@ -12,22 +13,27 @@ import java.util.List;
  * @author luiscarlosbeltran
  */
 public interface IFachadaOperacionesModelo {
-    // --- MÉTODOS DE HABITACIONES ---
-    List<Habitacion> buscarHabitacionesDisponibles(int numHuespedes, Date entrada, Date salida);
+    public void buscarHabitacionesDisponibles(int numHuespedes, Date entrada, Date salida);
     
-    List<Habitacion> recuperarHabitacionesDisponibles();
+    public List<Habitacion> recuperarHabitacionesDisponibles();
     
-    Habitacion buscarHabitacionPorNumero(int numHab);
-
-    // --- MÉTODOS DE CLIENTES ---
-    List<Cliente> buscarClientesDisponibles(String idBuscado);
+    public void buscarHabitacionPorNumero(int numHab);
     
-    List<Cliente> recuperarClientesDisponibles();
+    public Habitacion recuperarHabitacionSeleccionada();
     
-    Cliente buscarClientePorId(String idBuscado);
-
-    // --- MÉTODOS DE RESERVACIÓN ---
-    void guardarReservacion();
+    public void buscarClientesDisponibles(String idBuscado);
     
-    Reservacion recuperarReservacion();
+    public List<Cliente> recuperarClientesDisponibles();
+    
+    public void buscarClientePorId(String idBuscado);
+    
+    public void seleccionarCliente(Cliente cliente);
+    
+    public void guardarReservacion();
+    
+    public Reservacion recuperarReservacion();
+    
+    public void agregarObservador(Observador observador);
+    
+    public void eliminarObservador(Observador observador);
 }
